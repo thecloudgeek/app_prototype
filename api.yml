@@ -1,0 +1,360 @@
+openapi: 3.0.1
+info:
+  title: credit app orchestrator
+  description: 'credit app orcehstrator'
+  version: 1.0.0
+paths:
+  /applicant:
+    post:
+      summary: Create applicant
+      operationId: applicants.create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Applicant'
+        required: true
+      responses:
+        '201':
+          description: Applicant created
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Applicant created
+        '400':
+          description: invalid request
+        '500':
+          description: error
+  /applicant/{applicant_id}:
+    put:
+      summary: Update applicant
+      operationId: applicants.update
+      parameters:
+        - name: applicant_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Applicant'
+        required: true
+      responses:
+        '200':
+          description: Applicant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applicant'
+        '400':
+          description: invalid request
+        '404':
+          description: not found
+        '500':
+          description: error
+    get:
+      summary: Get applicant
+      operationId: applicants.read_one
+      parameters:
+        - name: applicant_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Applicant found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applicant'
+        '400':
+          description: invalid request
+        '404':
+          description: not found
+    delete:
+      summary: Delete applicant
+      operationId: applicants.delete
+      parameters:
+        - name: applicant_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Applicant deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Applicant Deleted
+        '404':
+          description: not found
+        '500':
+          description: error
+  /applicant/{applicant_id}/application:
+    post:
+      tags:
+        - Application
+      summary: Create new application
+      operationId: applications.create
+      parameters:
+        - name: applicantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        '201':
+          description: Application created
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Applicantion submitted
+        '400':
+          description: Malformed request
+        '404':
+          description: Applicant not found
+        '500':
+          description: Failed to save application
+    get:
+      tags: 
+        - Applications
+      summary: Get application list
+      operationId: applications.read_all
+      parameters: 
+        - name: applicant_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Application retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetApplicationList'
+        '400':
+          description: Malformed request
+        '404':
+          description: Applicant not found
+  /applicant/{applicant_id}/applications/{application_id}:
+    put:
+      tags:
+        - Application
+      summary: Update application
+      operationId: applications.update
+      parameters:
+        - name: applicant_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationUpdate'
+        required: true
+      responses:
+        '200':
+          description: Application updated
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Applicantion Updated
+        '400':
+          description: Malformed request
+        '404':
+          description: Application id not found
+    get:
+      tags:
+        - Application
+      summary: Get application
+      operationId: applications.read_one
+      parameters:
+        - name: applicant_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Application found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '400':
+          description: invalid request
+        '404':
+          description: Application not found
+components:
+  schemas:
+    ArrayOfLegalDocuments:
+      type: array
+      items:
+        type: object
+        properties:
+          documentId:
+            type: string
+            example: '234qe-adfa4-fgsv4-2456sfd'
+          link:
+            type: string
+            example: 'gcs://somebucket/somefolder/somedoc'
+          type:
+            type: string
+            enum:
+              - 'CAG'
+    Application:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum:
+            - 'directmail'
+            - 'ckea'
+            - 'paidsearch'
+        type:
+          type: string
+          enum:
+            - 'Credit'
+            - 'Prequal'
+        offerId:
+          type: string
+          example: 'asdfar87012374rsfvx'
+        ipAddress:
+          type: string
+          example: '101.101.101.101'
+        neuroIdIdentifier:
+          type: string
+          example: '3aqw-234rasdf-324qvxc-2345q'
+        threatmetrixSessionId:
+          type: string
+          example: 'sfdfgtw435tgdxsfgqe4rwaqes'
+        applicationAgreements:
+          type: boolean
+        cardholderAgreements:
+          type: boolean
+        electronicCommunication:
+          type: boolean
+        privacyPolicy:
+          type: boolean
+        termsOfService:
+          type: boolean
+        legaldocs:
+          $ref: '#/components/schemas/ArrayOfLegalDocuments'
+    ApplicationResponse:
+      allOf:
+        - $ref: '#/components/schemas/Application'
+        - type: object
+          properties:
+            applicantId:
+              type: string
+            applicationId:
+              type: string
+            state:
+              type: string
+              enum:
+                - APPROVED
+                - APPROVED_PENDING_POI_VERIFICATION
+                - DECLINED
+                - INELIGIBLE
+                - REQUEST_AUTO_BANK_LOGIN
+                - REQUEST_KYC
+                - REQUEST_IDENTITY_VERIFICATION
+    ApplicationUpdate:
+      allOf:
+        - $ref: '#/components/schemas/Application'
+        - type: object
+          properties:
+            state:
+              type: string
+              enum:
+                - APPROVED
+                - APPROVED_PENDING_POI_VERIFICATION
+                - DECLINED
+                - INELIGIBLE
+                - REQUEST_AUTO_BANK_LOGIN
+                - REQUEST_KYC
+                - REQUEST_IDENTITY_VERIFICATION
+    Applicant:
+      type: object
+      properties:
+        applicantId:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: Test
+        middleName:
+          type: string
+          example: T
+        lastName:
+          type: string
+          example: Tester
+        birthDate:
+          type: string
+          format: date
+          example: '01/01/2021'
+        ssn:
+          type: string
+          example: '123456789'
+        phoneNumber:
+          type: string
+          example: '123-321-4321'
+        emailAddress:
+          type: string
+          example: 'test@test.com'
+        addressLine1:
+          type: string
+          example: '123 Street'
+        addressLine2:
+          type: string
+          example: 'unit 2309'
+        city:
+          type: string
+          example: 'San Francisco'
+        state:
+          type: string
+          format: date
+          example: 'CA'
+        zip:
+          type: string
+          example: '12345-1234'
+    GetApplicationList:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationResponse'
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: http://virtserver.swaggerhub.com/myco/app-orchestrator/1.0.0
