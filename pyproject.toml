@@ -2,7 +2,7 @@
 name = "app_prototype"
 version = "0.1.0"
 description = ""
-authors = ["Scott Neaves <scott.neaves@missionlane.com>"]
+authors = ["Ronak Patel <thecloudgeek@missionlane.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
